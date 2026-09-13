@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- ── Google AdMob (react-native-google-mobile-ads) ──────────────────
+	     Real iOS App ID from the AdMob console (Multiflix iOS). Ad-unit IDs +
+	     the ADS_ENABLED master switch live in src/config/admob.ts. -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-7029440848837237~2986794986</string>
+	<!-- NSUserTrackingUsageDescription intentionally OMITTED: the app does not
+	     request App Tracking Transparency / track users while ads are disabled,
+	     and shipping the string makes App Store Review demand a "Tracking"
+	     privacy declaration. When ads go live: add this key back, implement the
+	     ATT prompt, and declare tracking in App Store Connect → App Privacy. -->
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+		<!-- TODO: add the full Google-recommended SKAdNetwork identifier list
+		     from https://developers.google.com/admob/ios/ios14 for best
+		     install attribution. -->
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Multiflix</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.791376194861-8900hcuo56cmd6r79dqs59oq97lrpnck</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.multiflix.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>multiflix</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Multiflix uses the camera so you can record videos and take photos to share in the app — for example, recording a short video for your feed, capturing a story, or taking a new profile picture.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Multiflix uses the microphone to record sound together with your videos — for example, capturing your voice or the background audio while you record a clip for your feed or a story.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Multiflix accesses your photo library so you can pick existing photos and videos to share — for example, selecting a video from your gallery to post to your feed or choosing a photo to set as your profile picture.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Multiflix saves photos and videos to your library — for example, keeping a copy of a video you recorded or edited in the app in your camera roll.</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Montserrat-Medium.ttf</string>
+		<string>Montserrat-Bold.ttf</string>
+		<string>Montserrat-SemiBold.ttf</string>
+		<string>Montserrat-Regular.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+</dict>
+</plist>

@@ -1,0 +1,73 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <!-- Android 13+ runtime notification permission (requested at runtime by FCM). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Required for double-tap-like haptic feedback (react-native-haptic-feedback). -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application
+      android:name=".MainApplication"
+      android:label="@string/app_name"
+      android:icon="@mipmap/ic_launcher"
+      android:roundIcon="@mipmap/ic_launcher_round"
+      android:allowBackup="false"
+      android:theme="@style/AppTheme"
+      android:hardwareAccelerated="true"
+      android:usesCleartextTraffic="${usesCleartextTraffic}"
+      android:supportsRtl="true">
+      <activity
+        android:name=".MainActivity"
+        android:label="@string/app_name"
+        android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+        android:launchMode="singleTask"
+        android:windowSoftInputMode="adjustResize"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        <!-- Verified App Link: https://multiflix.in/u/<username> opens the app.
+             Verification uses /.well-known/assetlinks.json on multiflix.in. -->
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="multiflix.in" android:pathPrefix="/u/" />
+            <data android:scheme="http" android:host="multiflix.in" android:pathPrefix="/u/" />
+        </intent-filter>
+        <!-- Custom-scheme fallback for in-app/manual deep links. -->
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="multiflix" android:host="u" />
+        </intent-filter>
+      </activity>
+
+      <!-- Google AdMob (react-native-google-mobile-ads). Real Android App ID
+           from the AdMob console (Multiflix Android). Ad-unit IDs + the
+           ADS_ENABLED master switch live in src/config/admob.ts. -->
+      <meta-data
+          android:name="com.google.android.gms.ads.APPLICATION_ID"
+          android:value="ca-app-pub-7029440848837237~2239420600"
+          tools:replace="android:value" />
+
+      <!-- FCM: default icon + channel used when the OS renders a push in background/terminated.
+           `tools:replace` overrides RN Firebase Messaging's empty defaults during manifest merge. -->
+      <meta-data
+          android:name="com.google.firebase.messaging.default_notification_icon"
+          android:resource="@drawable/ic_notification"
+          tools:replace="android:resource" />
+      <meta-data
+          android:name="com.google.firebase.messaging.default_notification_channel_id"
+          android:value="default"
+          tools:replace="android:value" />
+    </application>
+</manifest>

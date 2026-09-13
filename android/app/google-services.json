@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_number": "791376194861",
+    "project_id": "multiflix-1833c",
+    "storage_bucket": "multiflix-1833c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791376194861:android:58fb6a5321510cde5937a4",
+        "android_client_info": {
+          "package_name": "com.multiflix"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "791376194861-0vblj9q81donbpoeh3ge95n6ib1ocd6d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.multiflix",
+            "certificate_hash": "548dd39ece1434b25c281a9fbd477aafceb56e3f"
+          }
+        },
+        {
+          "client_id": "791376194861-9gif0u6fo5tq82n597uqhk3nnsrrmj4e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.multiflix",
+            "certificate_hash": "f78c21c23cd151b09479d4d39e563ce61ea22176"
+          }
+        },
+        {
+          "client_id": "791376194861-rpklooo9oh7rb39thklps6ske9onkrkn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.multiflix",
+            "certificate_hash": "1591669ea2438dcb37af4e728bc0b46c4fb7e52c"
+          }
+        },
+        {
+          "client_id": "791376194861-fdood1gdd2lrh6gqeia48il2uftbl4qc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtdRZNtPTodAdoPk1BSIM9wdppydQE5kU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "791376194861-fdood1gdd2lrh6gqeia48il2uftbl4qc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "791376194861-8900hcuo56cmd6r79dqs59oq97lrpnck.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.multiflix.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
