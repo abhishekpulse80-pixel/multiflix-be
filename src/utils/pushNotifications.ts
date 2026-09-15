@@ -55,7 +55,7 @@ async function waitForApnsTokenIfIOS(): Promise<void> {
     } catch {
       /* keep polling */
     }
-    await new Promise((r) => setTimeout(r, INTERVAL_MS));
+    await new Promise<void>(resolve => setTimeout(resolve, INTERVAL_MS));
   }
   console.warn(
     '[push] APNs token never arrived on iOS — check: (1) `aps-environment` ' +

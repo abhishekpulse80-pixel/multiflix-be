@@ -23,11 +23,11 @@ import type { RootStackParamList } from '../navigation/types';
 import {
   useGetOriginalSoundByIdQuery,
   useGetPostsUsingSoundQuery,
+  useGetSoundAudioStatusQuery,
 } from '../store/api/soundsApi';
 import { usePullToRefresh, REFRESH_TINT } from '../hooks/usePullToRefresh';
 import { useAppSelector } from '../store/hooks';
 import { selectAccessToken } from '../store/selectors';
-import { useAdaptiveMediaUrl } from '../hooks/useAdaptiveMediaUrl';
 import type { SoundPostListItem } from '../types/soundsApi';
 import { useTheme } from '../theme';
 import { formatCount } from '../utils/formatCount';
@@ -117,7 +117,14 @@ export function SoundDetailScreen({ navigation, route }: Props) {
   // mirrors how the picker row is shown so the visual identity is stable.
   const artUrl = sound?.ownerAvatarUrl ?? initialArtUrl ?? null;
   const audioUrl = sound?.audioUrl ?? null;
-  const adaptiveAudioUrl = useAdaptiveMediaUrl(audioUrl ?? '', 'audio', token);
+  const { data: audioStatus } = useGetSoundAudioStatusQuery(
+    { soundId, networkSpeedMbps: undefined },
+    { skip: !token || !audioUrl, pollingInterval: 3000 },
+  );
+  const audioPlaybackUrl =
+    audioStatus?.status === 'ready' && audioStatus.recommendedUrl
+      ? audioStatus.recommendedUrl
+      : audioUrl;
   const durationSeconds = sound?.durationSeconds ?? null;
   const ownerHandle = sound?.ownerUsername ? `@${sound.ownerUsername}` : null;
 
@@ -416,7 +423,7 @@ export function SoundDetailScreen({ navigation, route }: Props) {
       {audioUrl ? (
         <Video
           ref={videoRef}
-          source={{ uri: adaptiveAudioUrl }}
+          source={{ uri: audioPlaybackUrl ?? undefined }}
           paused={!isPlaying}
           repeat
           playInBackground={false}

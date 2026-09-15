@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Svg, { Path } from 'react-native-svg';
 import type { RootStackParamList } from '../navigation/types';
-import { useUploadSingleMediaMutation, useCreatePostMutation } from '../store';
+import { useUploadLargeMediaMutation, useCreatePostMutation } from '../store';
 import { localImageUriToUploadPayload } from '../utils/pickProfilePhoto';
 import { toCreatePostFileRef } from '../utils/toCreatePostFileRef';
 import { getApiErrorMessage } from '../utils/apiError';
@@ -107,7 +107,7 @@ export function CreatePostScreen({ navigation, route }: Props) {
     musicTrackId != null || attachedOriginalSoundId != null,
   );
 
-  const [uploadMedia] = useUploadSingleMediaMutation();
+  const [uploadMedia] = useUploadLargeMediaMutation();
   const [createPost] = useCreatePostMutation();
 
   const handlePost = useCallback(async () => {

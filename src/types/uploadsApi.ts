@@ -25,3 +25,27 @@ export type PresignUploadResponse = {
   acl: string | null;
   expiresIn: number;
 };
+
+export type MediaProcessingStatus = 'processing' | 'ready' | 'failed' | 'not_required';
+
+export type MediaStatusResponse = {
+  postId: string;
+  mediaKind: 'image' | 'short_video';
+  status: MediaProcessingStatus;
+  hlsUrl: string | null;
+  variants: Array<{
+    quality: string;
+    width: number;
+    height: number;
+    bitrateKbps: number;
+    playlistUrl: string;
+  }>;
+  error: string | null;
+};
+
+export type QualityProfileResponse = {
+  networkSpeedMbps: number;
+  networkProfile: string;
+  recommendedQuality: string;
+  maxResolution: string;
+};

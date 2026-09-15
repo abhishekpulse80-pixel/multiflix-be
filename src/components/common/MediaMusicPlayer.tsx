@@ -3,9 +3,9 @@ import Video, {
   type OnProgressData,
   type VideoRef,
 } from 'react-native-video';
-import { useAdaptiveMediaUrl } from '../../hooks/useAdaptiveMediaUrl';
 import { useAppSelector } from '../../store/hooks';
 import { selectAccessToken } from '../../store/selectors';
+import { useGetMusicTrackAudioStatusQuery } from '../../store/api/musicApi';
 
 /**
  * Hidden audio player for an attached music track.
@@ -20,6 +20,7 @@ import { selectAccessToken } from '../../store/selectors';
  */
 export type MediaMusicPlayerProps = {
   audioUrl: string;
+  trackId?: string;
   trimStartMs: number;
   paused: boolean;
   /** Window length in ms — default 15 000. */
@@ -37,6 +38,7 @@ const HIDDEN_STYLE = {
 
 export function MediaMusicPlayer({
   audioUrl,
+  trackId,
   trimStartMs,
   paused,
   windowMs = DEFAULT_WINDOW_MS,
@@ -44,9 +46,14 @@ export function MediaMusicPlayer({
 }: MediaMusicPlayerProps) {
   const ref = useRef<VideoRef>(null);
   const token = useAppSelector(selectAccessToken);
-  // Warm the adaptive cache without swapping the native audio source while
-  // the hidden player is active; source swaps can crash Android media codecs.
-  useAdaptiveMediaUrl(audioUrl, 'audio', token);
+  const { data: audioStatus } = useGetMusicTrackAudioStatusQuery(
+    { trackId: trackId ?? '', networkSpeedMbps: undefined },
+    { skip: !trackId || !token || !audioUrl, pollingInterval: 3000 },
+  );
+  const playbackUrl =
+    audioStatus?.status === 'ready' && audioStatus.recommendedUrl
+      ? audioStatus.recommendedUrl
+      : audioUrl;
   const startSec = trimStartMs / 1000;
   const endSec = startSec + windowMs / 1000;
 
@@ -67,7 +74,7 @@ export function MediaMusicPlayer({
   return (
     <Video
       ref={ref}
-      source={{ uri: audioUrl }}
+      source={{ uri: playbackUrl }}
       paused={paused}
       onLoad={handleLoad}
       onProgress={handleProgress}

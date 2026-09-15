@@ -40,6 +40,7 @@ import { useAppSelector } from '../store/hooks';
 import {
   useGetBlogByIdQuery,
   useGetBlogsQuery,
+  useGetBlogMediaStatusQuery,
   useIncrementBlogViewMutation,
   useSetBlogFavoriteMutation,
 } from '../store/api/blogsApi';
@@ -302,8 +303,23 @@ export function BloggingWatchScreen({ navigation, route }: Props) {
     }
     return getBloggingPostById(postId);
   }, [token, blogDetail, postId]);
+  const [mediaPollingActive, setMediaPollingActive] = useState(true);
+  useEffect(() => {
+    setMediaPollingActive(true);
+    const timeout = setTimeout(() => setMediaPollingActive(false), 5 * 60_000);
+    return () => clearTimeout(timeout);
+  }, [postId]);
+  const { data: mediaStatus } = useGetBlogMediaStatusQuery(postId, {
+    skip: !token || !current?.videoUrl || !mediaPollingActive,
+    pollingInterval: mediaPollingActive ? 3000 : 0,
+    skipPollingIfUnfocused: true,
+  });
+  const hlsVideoUrl =
+    mediaStatus?.status === 'ready' && mediaStatus.hlsUrl
+      ? mediaStatus.hlsUrl
+      : current?.videoUrl ?? '';
   const adaptiveVideoUrl = useAdaptiveMediaUrl(
-    current?.videoUrl ?? '',
+    hlsVideoUrl,
     'video',
     token,
   );

@@ -112,6 +112,21 @@ export type CreateStoryResponse = {
   story: StoryDto;
 };
 
+export type StoryMediaStatusResponse = {
+  mediaId: string;
+  mediaKind: StoryMediaKind;
+  status: 'processing' | 'ready' | 'failed' | 'not_required';
+  hlsUrl: string | null;
+  variants: Array<{
+    quality: string;
+    width: number;
+    height: number;
+    bitrateKbps: number;
+    playlistUrl: string;
+  }>;
+  error: string | null;
+};
+
 /** `GET /stories/user/:userId` — active (non-expired) stories for the profile ring. */
 export type UserStoriesResponse = {
   items: StoryDto[];

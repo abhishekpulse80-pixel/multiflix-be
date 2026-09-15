@@ -6,7 +6,15 @@ const PLACEHOLDER_MEDIA =
 
 /** Map API post to home `FeedPost` props. */
 export function mapFeedPostDtoToFeedPostData(p: FeedPostDto): FeedPostData {
-  const imageUri = p.media.url?.trim() || PLACEHOLDER_MEDIA;
+  const originalMediaUri = p.media.url?.trim() || '';
+  const hlsUri = p.hlsUrl?.trim() || '';
+  // HLS is only playable after processing has completed. While processing or
+  // after a failed conversion, keep using the uploaded media URL instead of
+  // sending the player to a missing `/hls/.../master.m3u8` resource.
+  const imageUri =
+    (p.mediaProcessingStatus === 'ready' && hlsUri
+      ? hlsUri
+      : originalMediaUri) || PLACEHOLDER_MEDIA;
   const avatarUri =
     typeof p.authorAvatarUrl === 'string' && p.authorAvatarUrl.trim().length > 0
       ? p.authorAvatarUrl.trim()
@@ -34,6 +42,8 @@ export function mapFeedPostDtoToFeedPostData(p: FeedPostDto): FeedPostData {
     isVideo: p.mediaKind === 'short_video',
     videoDurationSec: p.durationSeconds,
     posterUri: p.thumbnailUrl ?? undefined,
+    mediaProcessingStatus: p.mediaProcessingStatus,
+    hlsUrl: p.hlsUrl ?? null,
     createdAt: p.createdAt,
   };
 }
