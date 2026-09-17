@@ -47,3 +47,17 @@ export type PostsUsingSoundResponse = {
   hasMore: boolean;
   soundId: string;
 };
+
+export type AudioStatusResponse = {
+  soundId?: string;
+  trackId?: string;
+  status: 'processing' | 'ready' | 'failed' | 'not_required';
+  recommendedQuality?: 'low' | 'medium' | 'high';
+  recommendedUrl: string | null;
+  variants: Array<{
+    quality: 'low' | 'medium' | 'high';
+    bitrateKbps: number;
+    url: string;
+  }>;
+  error: string | null;
+};

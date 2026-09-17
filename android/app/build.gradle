@@ -84,7 +84,7 @@ android {
         applicationId "com.multiflix"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 52
+        versionCode 61
         versionName "3.3"
     }
     signingConfigs {

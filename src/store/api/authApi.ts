@@ -30,6 +30,20 @@ function isAuthGender(value: unknown): value is AuthGenderDto {
   );
 }
 
+type AuthSuccessPayload = Omit<AuthSuccessResponse, 'accessToken'> & {
+  accessToken?: string;
+  token?: string;
+};
+
+function normalizeAuthSuccess(response: unknown): AuthSuccessResponse {
+  const data = unwrapApiData<AuthSuccessPayload>(response);
+  const accessToken = data.accessToken ?? data.token;
+  if (!accessToken) {
+    throw new Error('Authentication response did not include a token.');
+  }
+  return { ...data, accessToken };
+}
+
 /** Use after `login` / `register` `unwrap()` so the token exists before navigation (avoids RTK race with `onQueryStarted`). */
 export function credentialsFromAuthSuccess(data: AuthSuccessResponse): {
   accessToken: string;
@@ -88,7 +102,7 @@ const injectedAuthApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (response: unknown) =>
-        unwrapApiData<AuthSuccessResponse>(response),
+        normalizeAuthSuccess(response),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -117,7 +131,7 @@ const injectedAuthApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (response: unknown) =>
-        unwrapApiData<AuthSuccessResponse>(response),
+        normalizeAuthSuccess(response),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -143,7 +157,7 @@ const injectedAuthApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (response: unknown) =>
-        unwrapApiData<AuthSuccessResponse>(response),
+        normalizeAuthSuccess(response),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -169,7 +183,7 @@ const injectedAuthApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (response: unknown) =>
-        unwrapApiData<AuthSuccessResponse>(response),
+        normalizeAuthSuccess(response),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;

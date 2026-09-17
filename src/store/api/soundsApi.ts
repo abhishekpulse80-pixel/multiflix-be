@@ -2,6 +2,7 @@ import type {
   OriginalSoundDto,
   OriginalSoundsListResponse,
   PostsUsingSoundResponse,
+  AudioStatusResponse,
 } from '../../types/soundsApi';
 import { unwrapApiData } from '../../utils/apiEnvelope';
 import { baseApi } from './baseApi';
@@ -52,6 +53,17 @@ const injectedSoundsApi = baseApi.injectEndpoints({
         { type: 'Sound' as const, id: `POSTS_${arg.soundId}` },
       ],
     }),
+    getSoundAudioStatus: build.query<
+      AudioStatusResponse,
+      { soundId: string; networkSpeedMbps?: number }
+    >({
+      query: ({ soundId, networkSpeedMbps }) => ({
+        url: `/sounds/${encodeURIComponent(soundId)}/audio-status`,
+        params: networkSpeedMbps == null ? undefined : { networkSpeedMbps },
+      }),
+      transformResponse: (response: unknown) =>
+        unwrapApiData<AudioStatusResponse>(response),
+    }),
   }),
 });
 
@@ -59,4 +71,5 @@ export const {
   useListOriginalSoundsQuery,
   useGetOriginalSoundByIdQuery,
   useGetPostsUsingSoundQuery,
+  useGetSoundAudioStatusQuery,
 } = injectedSoundsApi;

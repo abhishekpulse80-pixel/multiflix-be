@@ -9,6 +9,7 @@ import type {
   StoryViewersResponse,
   TrendingStoriesResponse,
   UserStoriesResponse,
+  StoryMediaStatusResponse,
 } from '../../types/storiesApi';
 import { unwrapApiData } from '../../utils/apiEnvelope';
 
@@ -120,6 +121,11 @@ const injectedStoriesApi = baseApi.injectEndpoints({
         return tags;
       },
     }),
+    getStoryMediaStatus: build.query<StoryMediaStatusResponse, string>({
+      query: storyId => `/stories/${encodeURIComponent(storyId)}/media-status`,
+      transformResponse: (response: unknown) =>
+        unwrapApiData<StoryMediaStatusResponse>(response),
+    }),
   }),
 });
 
@@ -134,4 +140,6 @@ export const {
   useRecordStoryViewMutation,
   useDeleteStoryMutation,
   useCreateStoryMutation,
+  useGetStoryMediaStatusQuery,
+  useLazyGetStoryMediaStatusQuery,
 } = injectedStoriesApi;

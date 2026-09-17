@@ -39,6 +39,7 @@ import {
   useReactToStoryMutation,
   useRecordStoryViewMutation,
   useDeleteStoryMutation,
+  useGetStoryMediaStatusQuery,
 } from '../store/api/storiesApi';
 import {
   useGetOrCreateConversationMutation,
@@ -50,6 +51,7 @@ import { toastError } from '../utils/toast';
 import { useAppSelector } from '../store/hooks';
 import { selectAccessToken, selectCurrentUser } from '../store/selectors';
 import { useAdaptiveMediaUrl } from '../hooks/useAdaptiveMediaUrl';
+import { useGetMusicTrackAudioStatusQuery } from '../store/api/musicApi';
 
 /* ─── constants ─────────────────────────────────────────────── */
 
@@ -92,12 +94,14 @@ const DEFAULT_STORY_MUSIC_WINDOW_MS = 30_000;
  */
 function StoryMusicPlayer({
   audioUrl,
+  trackId,
   trimStartMs,
   paused,
   onReady,
   windowMs,
 }: {
   audioUrl: string;
+  trackId: string;
   trimStartMs: number;
   paused: boolean;
   onReady?: () => void;
@@ -105,7 +109,14 @@ function StoryMusicPlayer({
 }) {
   const ref = useRef<VideoRef>(null);
   const token = useAppSelector(selectAccessToken);
-  const adaptiveAudioUrl = useAdaptiveMediaUrl(audioUrl, 'audio', token);
+  const { data: audioStatus } = useGetMusicTrackAudioStatusQuery(
+    { trackId, networkSpeedMbps: undefined },
+    { skip: !token || !audioUrl, pollingInterval: 3000 },
+  );
+  const adaptiveAudioUrl =
+    audioStatus?.status === 'ready' && audioStatus.recommendedUrl
+      ? audioStatus.recommendedUrl
+      : audioUrl;
   const startSec = trimStartMs / 1000;
   const endSec = startSec + (windowMs ?? DEFAULT_STORY_MUSIC_WINDOW_MS) / 1000;
 
@@ -314,6 +325,20 @@ export function StoryViewerScreen({ route, navigation }: Props) {
 
   const animRef = useRef<Animated.CompositeAnimation | null>(null);
   const story: StoryDto = stories[currentIndex];
+  const [mediaPollingActive, setMediaPollingActive] = useState(true);
+  useEffect(() => {
+    setMediaPollingActive(true);
+    const timeout = setTimeout(() => setMediaPollingActive(false), 5 * 60_000);
+    return () => clearTimeout(timeout);
+  }, [story.id]);
+  const { data: mediaStatus } = useGetStoryMediaStatusQuery(story.id, {
+    skip:
+      !isFocused ||
+      !mediaPollingActive ||
+      story.mediaKind !== 'short_video',
+    pollingInterval: mediaPollingActive ? 3000 : 0,
+    skipPollingIfUnfocused: true,
+  });
   const adaptiveStoryImageUrl = useAdaptiveMediaUrl(
     story.mediaKind === 'image' ? story.media?.url ?? '' : '',
     'image',
@@ -614,7 +639,12 @@ export function StoryViewerScreen({ route, navigation }: Props) {
 
   /* ── render ── */
 
-  const mediaUrl = story.media?.url;
+  const mediaUrl =
+    story.mediaKind === 'short_video' &&
+    mediaStatus?.status === 'ready' &&
+    mediaStatus.hlsUrl
+      ? mediaStatus.hlsUrl
+      : story.media?.url;
   const barWidth =
     (SCREEN_W - 16 - PROGRESS_GAP * (stories.length - 1)) / stories.length;
 
@@ -676,6 +706,7 @@ export function StoryViewerScreen({ route, navigation }: Props) {
         <StoryMusicPlayer
           key={`music-${story.id}`}
           audioUrl={story.music.audioUrl}
+          trackId={story.music.trackId}
           trimStartMs={story.music.trimStartMs}
           paused={paused || isStoryLoading || !isFocused}
           onReady={() => setMusicLoaded(true)}

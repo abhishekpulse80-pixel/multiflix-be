@@ -60,3 +60,18 @@ export type CreateBlogRequest = {
 export type CreateBlogResponse = {
   blog: { id: string };
 };
+
+export type BlogMediaStatusResponse = {
+  mediaId: string;
+  mediaKind: 'video';
+  status: 'processing' | 'ready' | 'failed' | 'not_required';
+  hlsUrl: string | null;
+  variants: Array<{
+    quality: string;
+    width: number;
+    height: number;
+    bitrateKbps: number;
+    playlistUrl: string;
+  }>;
+  error: string | null;
+};

@@ -1,7 +1,9 @@
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import { API_BASE_URL } from '../../config/api';
 import type {
+  MediaStatusResponse,
   PresignUploadResponse,
+  QualityProfileResponse,
   UploadSingleResponse,
 } from '../../types/uploadsApi';
 import { unwrapApiData } from '../../utils/apiEnvelope';
@@ -182,8 +184,32 @@ const injectedUploadsApi = baseApi.injectEndpoints({
         }
       },
     }),
+    getPostMediaStatus: build.query<MediaStatusResponse, string>({
+      query: postId => `/posts/${encodeURIComponent(postId)}/media-status`,
+      transformResponse: (response: unknown) =>
+        unwrapApiData<MediaStatusResponse>(response),
+    }),
+    getUploadQualityProfile: build.query<
+      QualityProfileResponse,
+      number | undefined
+    >({
+      query: networkSpeedMbps => {
+        const query = networkSpeedMbps == null
+          ? ''
+          : `?networkSpeedMbps=${encodeURIComponent(String(networkSpeedMbps))}`;
+        return `/uploads/quality-profile${query}`;
+      },
+      transformResponse: (response: unknown) =>
+        unwrapApiData<QualityProfileResponse>(response),
+    }),
   }),
 });
 
-export const { useUploadSingleMediaMutation, useUploadLargeMediaMutation } =
-  injectedUploadsApi;
+export const {
+  useUploadSingleMediaMutation,
+  useUploadLargeMediaMutation,
+  useGetPostMediaStatusQuery,
+  useLazyGetPostMediaStatusQuery,
+  useGetUploadQualityProfileQuery,
+  useLazyGetUploadQualityProfileQuery,
+} = injectedUploadsApi;

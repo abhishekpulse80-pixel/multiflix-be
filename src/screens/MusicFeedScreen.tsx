@@ -24,7 +24,7 @@ import { useGetPostsByMusicTrackQuery } from '../store/api/feedApi';
 import { usePullToRefresh, REFRESH_TINT } from '../hooks/usePullToRefresh';
 import { useAppSelector } from '../store/hooks';
 import { selectAccessToken } from '../store/selectors';
-import { useAdaptiveMediaUrl } from '../hooks/useAdaptiveMediaUrl';
+import { useGetMusicTrackAudioStatusQuery } from '../store/api/musicApi';
 import type { FeedPostDto } from '../types/feedApi';
 import { useTheme } from '../theme';
 import { formatCount } from '../utils/formatCount';
@@ -104,7 +104,14 @@ export function MusicFeedScreen({ navigation, route }: Props) {
   const artistName = data?.music?.artistName ?? null;
   const artUrl = data?.music?.artUrl ?? initialArtUrl ?? null;
   const audioUrl = data?.music?.audioUrl ?? null;
-  const adaptiveAudioUrl = useAdaptiveMediaUrl(audioUrl ?? '', 'audio', token);
+  const { data: audioStatus } = useGetMusicTrackAudioStatusQuery(
+    { trackId, networkSpeedMbps: undefined },
+    { skip: !token || !audioUrl, pollingInterval: 3000 },
+  );
+  const audioPlaybackUrl =
+    audioStatus?.status === 'ready' && audioStatus.recommendedUrl
+      ? audioStatus.recommendedUrl
+      : audioUrl;
   const durationSeconds = data?.music?.durationSeconds ?? null;
 
   // ── Audio preview (play/pause on album art) ────────────────────────────
@@ -445,7 +452,7 @@ export function MusicFeedScreen({ navigation, route }: Props) {
       {audioUrl ? (
         <Video
           ref={videoRef}
-          source={{ uri: adaptiveAudioUrl }}
+          source={{ uri: audioPlaybackUrl ?? undefined }}
           paused={!isPlaying}
           repeat
           playInBackground={false}

@@ -11,6 +11,7 @@ import type {
 } from '../../types/musicApi';
 import { unwrapApiData } from '../../utils/apiEnvelope';
 import { baseApi } from './baseApi';
+import type { AudioStatusResponse } from '../../types/soundsApi';
 
 const injectedMusicApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -55,6 +56,17 @@ const injectedMusicApi = baseApi.injectEndpoints({
       providesTags: (_result, _error, trackId) => [
         { type: 'Music' as const, id: `TRACK_${trackId}` },
       ],
+    }),
+    getMusicTrackAudioStatus: build.query<
+      AudioStatusResponse,
+      { trackId: string; networkSpeedMbps?: number }
+    >({
+      query: ({ trackId, networkSpeedMbps }) => ({
+        url: `/music/tracks/${encodeURIComponent(trackId)}/audio-status`,
+        params: networkSpeedMbps == null ? undefined : { networkSpeedMbps },
+      }),
+      transformResponse: (response: unknown) =>
+        unwrapApiData<AudioStatusResponse>(response),
     }),
     getMusicArtists: build.query<
       MusicArtistListResponse,
@@ -309,6 +321,7 @@ export const {
   useGetMusicRecommendedTracksQuery,
   useGetMusicAlbumByIdQuery,
   useGetMusicTrackByIdQuery,
+  useGetMusicTrackAudioStatusQuery,
   useGetMusicArtistsQuery,
   useGetMusicArtistByIdQuery,
   useGetMusicFavouritesQuery,

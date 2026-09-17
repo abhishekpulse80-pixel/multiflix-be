@@ -33,6 +33,7 @@ import {
   useSetPostLikeMutation,
   useSetPostSaveMutation,
 } from '../../store/api/feedApi';
+import { useLazyGetPostMediaStatusQuery } from '../../store/api/uploadsApi';
 import { useBlockUserMutation } from '../../store/api/usersApi';
 import { ConfirmSheet } from '../common/ConfirmSheet';
 import { formatCount } from '../../utils/formatCount';
@@ -93,6 +94,12 @@ export type FeedPostData = {
   videoDurationSec?: number | null;
   /** Poster / thumbnail for video posts (shown while loading). */
   posterUri?: string;
+  mediaProcessingStatus?:
+  | 'processing'
+  | 'ready'
+  | 'failed'
+  | 'not_required';
+  hlsUrl?: string | null;
   /** ISO upload timestamp — shown as relative time in the 3-dot menu. */
   createdAt?: string;
 };
@@ -148,6 +155,8 @@ export const FeedPost = React.memo(function FeedPost({
   const [liked, setLiked] = useState(() => post.likedByViewer ?? false);
   const [likesCount, setLikesCount] = useState(post.likes);
   const [setPostLike] = useSetPostLikeMutation();
+  const [getPostMediaStatus] = useLazyGetPostMediaStatusQuery();
+  const [videoUri, setVideoUri] = useState(post.imageUri);
   // Caption truncation: measure the full line count once (numberOfLines is
   // left off until then), then clamp to CAPTION_COLLAPSED_LINES with a
   // "more"/"less" toggle so a long caption can't take over the screen.
@@ -196,6 +205,64 @@ export const FeedPost = React.memo(function FeedPost({
    * video to pause leaves the music playing and they drift out of sync.
    */
   const [videoPaused, setVideoPaused] = useState<boolean>(false);
+
+  useEffect(() => {
+    const initialUri =
+      post.mediaProcessingStatus === 'ready' && post.hlsUrl
+        ? post.hlsUrl
+        : post.imageUri;
+    setVideoUri(initialUri);
+  }, [post.id, post.imageUri, post.mediaProcessingStatus, post.hlsUrl]);
+
+  useEffect(() => {
+    if (!post.isVideo || !isVisible || post.mediaProcessingStatus === 'failed') {
+      return;
+    }
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const deadline = Date.now() + 5 * 60_000;
+
+    const poll = async () => {
+      try {
+        const status = await getPostMediaStatus(post.id, true).unwrap();
+        if (__DEV__) {
+          console.log('[Media Status]', {
+            postId: post.id,
+            status: status.status,
+            hlsUrl: status.hlsUrl,
+            variants: status.variants,
+            error: status.error,
+          });
+        }
+        if (cancelled) return;
+        if (status.status === 'ready' && status.hlsUrl) {
+          setVideoUri(status.hlsUrl);
+          return;
+        }
+        if (status.status === 'failed' || status.status === 'not_required') {
+          return;
+        }
+      } catch {
+        // Keep the uploaded media playing while the status endpoint is unavailable.
+      }
+      if (!cancelled && Date.now() < deadline) {
+        timer = setTimeout(poll, 3000);
+      }
+    };
+
+    void poll();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [
+    getPostMediaStatus,
+    isVisible,
+    post.id,
+    post.isVideo,
+    post.mediaProcessingStatus,
+  ]);
 
   const postRef = useMemo<MessagePostRefInput>(() => {
     const thumb = post.isVideo
@@ -296,7 +363,7 @@ export const FeedPost = React.memo(function FeedPost({
     <View style={[styles.cell, { width, height }]}>
       {post.isVideo ? (
         <FeedVideo
-          uri={post.imageUri}
+          uri={videoUri}
           posterUri={post.posterUri}
           style={StyleSheet.absoluteFill}
           isVisible={isVisible}
@@ -336,6 +403,7 @@ export const FeedPost = React.memo(function FeedPost({
         <MediaMusicPlayer
           key={`feed-music-${post.id}-${post.music.trackId}`}
           audioUrl={post.music.audioUrl}
+          trackId={post.music.trackId}
           trimStartMs={post.music.trimStartMs}
           // Music is paused whenever the video is buffering OR the user
           // has paused it — keeps audio in lockstep with the visuals.
@@ -345,9 +413,9 @@ export const FeedPost = React.memo(function FeedPost({
           windowMs={
             post.isVideo
               ? Math.min(
-                  60_000,
-                  Math.round((post.videoDurationSec ?? 60) * 1000),
-                )
+                60_000,
+                Math.round((post.videoDurationSec ?? 60) * 1000),
+              )
               : 30_000
           }
         />
@@ -361,7 +429,7 @@ export const FeedPost = React.memo(function FeedPost({
           <Pressable
             style={styles.actionBtn}
             onPress={() => {
-              onToggleLike().catch(() => {});
+              onToggleLike().catch(() => { });
             }}
             accessibilityLabel={liked ? 'Unlike' : 'Like'}
             accessibilityState={{ selected: liked }}
@@ -404,7 +472,7 @@ export const FeedPost = React.memo(function FeedPost({
           <Pressable
             style={styles.actionBtn}
             onPress={() => {
-              onToggleSave().catch(() => {});
+              onToggleSave().catch(() => { });
             }}
             accessibilityLabel={saved ? 'Unsave' : 'Save'}
             accessibilityState={{ selected: saved }}

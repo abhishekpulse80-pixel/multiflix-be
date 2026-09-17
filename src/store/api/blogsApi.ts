@@ -7,6 +7,7 @@ import type {
   BlogViewResponse,
   CreateBlogRequest,
   CreateBlogResponse,
+  BlogMediaStatusResponse,
 } from '../../types/blogApi';
 import { unwrapApiData } from '../../utils/apiEnvelope';
 
@@ -75,6 +76,11 @@ const injectedBlogsApi = baseApi.injectEndpoints({
         { type: 'Blog' as const, id: 'TRENDING' },
       ],
     }),
+    getBlogMediaStatus: build.query<BlogMediaStatusResponse, string>({
+      query: blogId => `/blogs/${encodeURIComponent(blogId)}/media-status`,
+      transformResponse: (response: unknown) =>
+        unwrapApiData<BlogMediaStatusResponse>(response),
+    }),
     deleteBlog: build.mutation<{ deleted: boolean }, string>({
       query: (blogId) => ({
         url: `/blogs/${encodeURIComponent(blogId)}`,
@@ -97,5 +103,7 @@ export const {
   useSetBlogFavoriteMutation,
   useIncrementBlogViewMutation,
   useCreateBlogMutation,
+  useGetBlogMediaStatusQuery,
+  useLazyGetBlogMediaStatusQuery,
   useDeleteBlogMutation,
 } = injectedBlogsApi;

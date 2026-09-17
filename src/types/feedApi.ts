@@ -53,6 +53,21 @@ export type FeedPostDto = {
   authorAvatarUrl: string | null;
   mediaKind: 'image' | 'short_video';
   media: FeedPostMediaDto;
+  /** HLS conversion state for video posts; images are `not_required`. */
+  mediaProcessingStatus?:
+    | 'processing'
+    | 'ready'
+    | 'failed'
+    | 'not_required';
+  hlsUrl?: string | null;
+  hlsVariants?: Array<{
+    quality: string;
+    width: number;
+    height: number;
+    bitrateKbps: number;
+    playlistUrl: string;
+  }>;
+  mediaProcessingError?: string | null;
   /** Auto-generated poster image for video posts. */
   thumbnailUrl: string | null;
   caption: string | null;

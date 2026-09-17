@@ -85,6 +85,10 @@ export async function getBestMediaUrl({
 }): Promise<string> {
   if (!mediaUrl || !token || !/^https?:\/\//i.test(mediaUrl)) return mediaUrl;
 
+  // HLS URLs are already adaptive manifests. Do not send them through the
+  // upload-adaptive endpoint, which can return a stale/nonexistent variant.
+  if (/\.m3u8(?:\?|$)/i.test(mediaUrl)) return mediaUrl;
+
   const networkSpeedMbps = normalizeSpeed(await getNetworkSpeedMbps());
   const cacheKey = `${mediaKind}:${networkSpeedMbps}:${mediaUrl}`;
   const cached = mediaUrlCache.get(cacheKey);
