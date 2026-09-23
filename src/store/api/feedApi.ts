@@ -2,6 +2,8 @@ import { baseApi } from './baseApi';
 import type {
   CreatePostRequest,
   CreatePostResponse,
+  FeedPostDto,
+  GetPostResponse,
   HashtagPostsResponse,
   HomeFeedResponse,
   MusicPostsResponse,
@@ -29,6 +31,14 @@ const injectedFeedApi = baseApi.injectEndpoints({
         unwrapApiData<HomeFeedResponse>(response),
       providesTags: (result, _err, arg) =>
         result && arg.page === 0 ? [{ type: 'Feed' as const, id: 'HOME' }] : [],
+    }),
+    getPostById: build.query<FeedPostDto, string>({
+      query: postId => `/posts/${encodeURIComponent(postId)}`,
+      transformResponse: (response: unknown) => {
+        const payload = unwrapApiData<GetPostResponse>(response);
+        return 'post' in payload ? payload.post : payload;
+      },
+      providesTags: (_result, _error, postId) => [{ type: 'Post' as const, id: postId }],
     }),
     getTrendingPosts: build.query<TrendingPostsResponse, void>({
       // Trending screen renders a bounded feed of up to 100 posts (10 strips
@@ -467,6 +477,7 @@ const injectedFeedApi = baseApi.injectEndpoints({
 export const {
   useGetHomeFeedQuery,
   useLazyGetHomeFeedQuery,
+  useLazyGetPostByIdQuery,
   useGetTrendingPostsQuery,
   useLazyGetTrendingPostsQuery,
   useGetPostsByHashtagQuery,

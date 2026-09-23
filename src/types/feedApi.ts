@@ -103,6 +103,8 @@ export type FeedPostDto = {
   updatedAt: string;
 };
 
+export type GetPostResponse = FeedPostDto | { post: FeedPostDto };
+
 export type SponsoredAdDto = {
   id: string;
   imageUrl: string;

@@ -16,6 +16,7 @@
       android:name=".MainApplication"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
+    android:logo="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:theme="@style/AppTheme"
@@ -42,12 +43,39 @@
             <data android:scheme="https" android:host="multiflix.in" android:pathPrefix="/u/" />
             <data android:scheme="http" android:host="multiflix.in" android:pathPrefix="/u/" />
         </intent-filter>
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="multiflix.in" android:pathPrefix="/m/" />
+            <data android:scheme="https" android:host="multiflix.in" android:pathPrefix="/b/" />
+            <data android:scheme="https" android:host="multiflix.in" android:pathPrefix="/v/" />
+            <data android:scheme="http" android:host="multiflix.in" android:pathPrefix="/m/" />
+            <data android:scheme="http" android:host="multiflix.in" android:pathPrefix="/b/" />
+            <data android:scheme="http" android:host="multiflix.in" android:pathPrefix="/v/" />
+        </intent-filter>
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="www.multiflix.in" android:pathPrefix="/u/" />
+            <data android:scheme="http" android:host="www.multiflix.in" android:pathPrefix="/u/" />
+            <data android:scheme="https" android:host="www.multiflix.in" android:pathPrefix="/m/" />
+            <data android:scheme="https" android:host="www.multiflix.in" android:pathPrefix="/b/" />
+            <data android:scheme="https" android:host="www.multiflix.in" android:pathPrefix="/v/" />
+            <data android:scheme="http" android:host="www.multiflix.in" android:pathPrefix="/m/" />
+            <data android:scheme="http" android:host="www.multiflix.in" android:pathPrefix="/b/" />
+            <data android:scheme="http" android:host="www.multiflix.in" android:pathPrefix="/v/" />
+        </intent-filter>
         <!-- Custom-scheme fallback for in-app/manual deep links. -->
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="multiflix" android:host="u" />
+            <data android:scheme="multiflix" android:host="u" android:pathPrefix="/" />
+            <data android:scheme="multiflix" android:host="m" android:pathPrefix="/" />
+            <data android:scheme="multiflix" android:host="b" android:pathPrefix="/" />
+            <data android:scheme="multiflix" android:host="v" android:pathPrefix="/" />
         </intent-filter>
       </activity>
 

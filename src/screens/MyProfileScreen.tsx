@@ -1,10 +1,13 @@
 import {
-  useFocusEffect } from '@react-navigation/native';
+  useFocusEffect
+} from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React,
-  { useCallback,
+{
+  useCallback,
   useMemo,
-  useState } from 'react';
+  useState
+} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -27,10 +30,10 @@ import {
   SettingsGearIcon,
 } from '../components/profile/ProfileHeaderIcons';
 import { FeedShareIcon } from '../components/icons/FeedActionIcons';
+import { ShareToChatSheet } from '../components/home/ShareToChatSheet';
 import Svg, { Path } from 'react-native-svg';
 import { ProfileMasonry } from '../components/profile/ProfileMasonry';
 import { ProfilePodcastList } from '../components/profile/ProfilePodcastList';
-import { ShareToChatSheet } from '../components/home/ShareToChatSheet';
 import type { ProfileGridItem } from '../data/publicUserProfileMock';
 import { MY_PROFILE_MOCK } from '../data/myProfileMock';
 import { ProfilePhotoSourceSheet } from '../components/profile/ProfilePhotoSourceSheet';
@@ -405,7 +408,7 @@ export function MyProfileScreen(
               {
                 text: 'Open Settings',
                 onPress: () => {
-                  openAppSettings().catch(() => {});
+                  openAppSettings().catch(() => { });
                 },
               },
             ],
@@ -483,7 +486,7 @@ export function MyProfileScreen(
               {
                 text: 'Open Settings',
                 onPress: () => {
-                  openAppSettings().catch(() => {});
+                  openAppSettings().catch(() => { });
                 },
               },
             ],
@@ -737,7 +740,7 @@ export function MyProfileScreen(
     ) {
       return;
     }
-    loadPostsPage(0).catch(() => {});
+    loadPostsPage(0).catch(() => { });
   }, [tab, token, currentUserId, postsLoaded, postsFetching, loadPostsPage]);
 
   React.useEffect(() => {
@@ -750,21 +753,21 @@ export function MyProfileScreen(
     ) {
       return;
     }
-    loadBlogsPage(0).catch(() => {});
+    loadBlogsPage(0).catch(() => { });
   }, [tab, token, currentUserId, blogsLoaded, blogsFetching, loadBlogsPage]);
 
   const onLoadMorePosts = useCallback(() => {
     if (tab !== 'grid' || !postsHasMore || postsFetching) {
       return;
     }
-    loadPostsPage(postsPage + 1).catch(() => {});
+    loadPostsPage(postsPage + 1).catch(() => { });
   }, [tab, postsHasMore, postsFetching, loadPostsPage, postsPage]);
 
   const onLoadMorePodcasts = useCallback(() => {
     if (tab !== 'podcasts' || !blogsHasMore || blogsFetching) {
       return;
     }
-    loadBlogsPage(blogsPage + 1).catch(() => {});
+    loadBlogsPage(blogsPage + 1).catch(() => { });
   }, [tab, blogsHasMore, blogsFetching, loadBlogsPage, blogsPage]);
 
   // Memoized so an unrelated re-render doesn't spread-copy the lists into a new
@@ -776,8 +779,8 @@ export function MyProfileScreen(
           ? [...publicBlogs]
           : []
         : token
-        ? [...publicPosts]
-        : [...p.grid],
+          ? [...publicPosts]
+          : [...p.grid],
     [tab, token, publicBlogs, publicPosts, p.grid],
   );
   // Only show the skeleton when there's genuinely nothing to show yet. With
@@ -1169,6 +1172,7 @@ export function MyProfileScreen(
             : null
         }
       />
+
       <ProfilePhotoSourceSheet
         visible={storyPickerOpen}
         onClose={() => setStoryPickerOpen(false)}

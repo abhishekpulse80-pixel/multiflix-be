@@ -28,7 +28,7 @@ import {
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BloggingListSkeleton } from '../components/blogging/BloggingSkeletons';
 import { UserAvatar } from '../components/common/UserAvatar';
-import { FeedHeartIcon } from '../components/icons/FeedActionIcons';
+import { FeedHeartIcon, FeedShareIcon } from '../components/icons/FeedActionIcons';
 import {
   BLOGGING_ALL_POSTS,
   filterBloggingPostsByQuery,
@@ -739,6 +739,14 @@ const styles = StyleSheet.create({
   cardText: {
     flex: 1,
     minWidth: 0,
+  },
+  shareOnCard: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.12)',
   },
   cardTitle: {
     fontSize: 16,

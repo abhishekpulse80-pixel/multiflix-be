@@ -68,6 +68,7 @@ function toFeedPost(row: ViewerPost): FeedPostData {
     musicTitle: row.musicTitle,
     music: row.music ?? null,
     originalSound: row.originalSound ?? null,
+    posterUri: row.posterUri ?? undefined,
     videoDurationSec: row.videoDurationSec ?? null,
     likes: row.likes,
     comments: row.comments,

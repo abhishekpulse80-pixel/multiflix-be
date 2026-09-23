@@ -3,9 +3,11 @@ import { Platform } from 'react-native';
 /**
  * Base URL for REST API (no trailing slash). Dev targets the local backend.
  * Android emulator uses 10.0.2.2; iOS simulator uses 127.0.0.1.
+ * If you run on a physical device, replace this with your Mac's LAN IP.
  */
 const DEV_HOST = Platform.select({
   android: 'https://backend.multiflix.in/api/v1',
+  ios: 'https://backend.multiflix.in/api/v1',
   default: 'https://backend.multiflix.in/api/v1',
 });
 

@@ -11,6 +11,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:multiflix.in</string>
+		<string>applinks:www.multiflix.in</string>
 	</array>
 </dict>
 </plist>

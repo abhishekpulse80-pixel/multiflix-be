@@ -65,6 +65,12 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:multiflix.in</string>
+		<string>applinks:www.multiflix.in</string>
+	</array>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

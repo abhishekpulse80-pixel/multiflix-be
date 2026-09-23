@@ -20,7 +20,6 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   onBlock: () => void;
-  /** Share this profile via the native share sheet. */
   onShare?: () => void;
   /** Optional: the handle/name to show in the sheet title. */
   subject?: string;
@@ -66,18 +65,11 @@ export function UserProfileActionsSheet({
           {onShare ? (
             <>
               <Pressable
-                style={({ pressed }) => [
-                  styles.row,
-                  pressed && styles.rowPressed,
-                ]}
+                style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
                 onPress={onShare}
                 accessibilityRole="button"
                 accessibilityLabel="Share this profile">
-                <Text
-                  style={[
-                    styles.rowLabel,
-                    { fontFamily: t.fontFamily.semibold },
-                  ]}>
+                <Text style={[styles.rowLabel, { fontFamily: t.fontFamily.semibold }]}>
                   Share this profile
                 </Text>
               </Pressable>

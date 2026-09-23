@@ -201,6 +201,7 @@ export type RootStackParamList = {
         title: string;
         ownerUsername: string;
       } | null;
+      posterUri?: string | null;
       /** Source video duration (s) — used to size the music window. */
       videoDurationSec?: number | null;
       comments: number;
@@ -228,6 +229,7 @@ export type RootStackParamList = {
         title: string;
         ownerUsername: string;
       } | null;
+      posterUri?: string | null;
       /** Source video duration (s) — used to size the music window. */
       videoDurationSec?: number | null;
       comments: number;

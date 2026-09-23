@@ -16,8 +16,14 @@ import {
   useLazyGetMeQuery,
 } from '../store';
 import { useTheme } from '../theme';
+import { rootNavigationRef } from '../navigation/rootNavigationRef';
 
 const MIN_SPLASH_MS = 1400;
+type SplashExitRoute =
+  | 'Onboarding'
+  | 'Main'
+  | 'FillProfile'
+  | 'ChooseInterests';
 
 /**
  * Only an explicit auth rejection (HTTP 401/403) means the stored session is
@@ -41,6 +47,12 @@ export function SplashScreen({ navigation }: SplashScreenProps) {
   persistedUserRef.current = persistedUser;
   const [fetchMe] = useLazyGetMeQuery();
 
+  const replaceIfStillSplash = (route: SplashExitRoute) => {
+    if (rootNavigationRef.getCurrentRoute()?.name === 'Splash') {
+      navigation.replace(route);
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -56,7 +68,7 @@ export function SplashScreen({ navigation }: SplashScreenProps) {
       if (!accessToken) {
         await waitMin();
         if (!cancelled) {
-          navigation.replace('Onboarding');
+          replaceIfStillSplash('Onboarding');
         }
         return;
       }
@@ -68,9 +80,9 @@ export function SplashScreen({ navigation }: SplashScreenProps) {
           return;
         }
         if (user.isOnboarded) {
-          navigation.replace('Main');
+          replaceIfStillSplash('Main');
         } else {
-          navigation.replace(getFirstIncompleteOnboardingScreen(user));
+          replaceIfStillSplash(getFirstIncompleteOnboardingScreen(user));
         }
       } catch (err) {
         await waitMin();
@@ -80,7 +92,7 @@ export function SplashScreen({ navigation }: SplashScreenProps) {
         // Definitive auth rejection → the token really is invalid: sign out.
         if (isAuthRejection(err)) {
           dispatch(clearSession());
-          navigation.replace('Onboarding');
+          replaceIfStillSplash('Onboarding');
           return;
         }
         // Transient failure (offline / timeout / server blip on cold start) —
@@ -89,14 +101,14 @@ export function SplashScreen({ navigation }: SplashScreenProps) {
         // refetch and surface their own errors.
         const cachedUser = persistedUserRef.current;
         if (cachedUser) {
-          navigation.replace(
+          replaceIfStillSplash(
             cachedUser.isOnboarded
               ? 'Main'
               : getFirstIncompleteOnboardingScreen(cachedUser),
           );
         } else {
           // Have a token but no cached user (rare) — let Main load and refetch.
-          navigation.replace('Main');
+          replaceIfStillSplash('Main');
         }
       }
     };
