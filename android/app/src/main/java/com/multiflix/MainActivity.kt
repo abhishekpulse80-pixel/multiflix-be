@@ -1,5 +1,6 @@
 package com.multiflix
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.WindowCompat
 import com.facebook.react.ReactActivity
@@ -13,6 +14,11 @@ class MainActivity : ReactActivity() {
     super.onCreate(savedInstanceState)
     // Edge-to-edge: content may draw under system bars (screens use safe area where needed).
     WindowCompat.setDecorFitsSystemWindows(window, false)
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
   }
 
   /**

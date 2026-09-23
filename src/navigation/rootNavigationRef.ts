@@ -2,6 +2,7 @@ import { createNavigationContainerRef } from '@react-navigation/native';
 import type { RootStackParamList } from './types';
 import { store } from '../store';
 import { selectCurrentUser } from '../store/selectors';
+import type { FeedPostDto } from '../types/feedApi';
 
 export const rootNavigationRef =
   createNavigationContainerRef<RootStackParamList>();
@@ -137,6 +138,54 @@ export function navigateToBloggingWatch(postId: string) {
       params: { screen: 'BloggingWatch', params: { postId } },
     } as never);
   }
+}
+
+export function navigateToMusicNowPlaying(trackId: string) {
+  if (rootNavigationRef.isReady()) {
+    rootNavigationRef.navigate('Main', {
+      screen: 'music',
+      params: { screen: 'MusicNowPlaying', params: { trackId } },
+    } as never);
+  }
+}
+
+export function navigateToHomeFeed() {
+  if (rootNavigationRef.isReady()) {
+    rootNavigationRef.navigate('Main', {
+      screen: 'home',
+      params: { screen: 'HomeFeed' },
+    } as never);
+  }
+}
+
+export function navigateToPost(post: FeedPostDto) {
+  if (!rootNavigationRef.isReady()) return;
+  rootNavigationRef.navigate('UserProfilePostsViewer', {
+    userId: post.authorId,
+    userDisplayName: post.authorFullName,
+    userHandle: post.authorUsername,
+    userAvatarUri: post.authorAvatarUrl ?? '',
+    initialPostId: post.id,
+    initialPage: 0,
+    hasMore: false,
+    posts: [{
+      id: post.id,
+      uri: post.media.url ?? post.thumbnailUrl ?? '',
+      likes: post.likesCount,
+      isVideo: post.mediaKind === 'short_video',
+      caption: post.caption ?? '',
+      hashtags: post.hashtags ?? '',
+      musicTitle: post.musicTitle ?? '',
+      music: post.music,
+      originalSound: post.originalSound,
+      posterUri: post.thumbnailUrl,
+      videoDurationSec: post.durationSeconds,
+      comments: post.commentsCount,
+      likedByViewer: post.likedByViewer,
+      savedByViewer: post.savedByViewer,
+      createdAt: post.createdAt,
+    }],
+  });
 }
 
 /**

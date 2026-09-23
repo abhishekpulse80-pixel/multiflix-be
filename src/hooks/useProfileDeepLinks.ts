@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Linking } from 'react-native';
 import {
+  navigateToHomeFeed,
+  navigateToMusicNowPlaying,
+  navigateToBloggingWatch,
+  navigateToPost,
   navigateToUserProfile,
   rootNavigationRef,
 } from '../navigation/rootNavigationRef';
+import { useLazyGetPostByIdQuery } from '../store/api/feedApi';
 import { useLazyResolveUsernameQuery } from '../store/api/usersApi';
+import type { DeepLinkTarget } from '../utils/deepLinks';
+import { targetFromUrl } from '../utils/deepLinks';
 
 /**
  * Extract the @username from a profile deep link, or null. Parsed with regex
@@ -13,13 +20,6 @@ import { useLazyResolveUsernameQuery } from '../store/api/usersApi';
  *   http://multiflix.in/u/<username>   (and optional www.)
  *   multiflix://u/<username>           (custom-scheme fallback)
  */
-function usernameFromUrl(url: string): string | null {
-  const custom = url.match(/^multiflix:\/\/u\/([^/?#]+)/i);
-  if (custom?.[1]) return decodeURIComponent(custom[1]);
-  const web = url.match(/^https?:\/\/(?:www\.)?multiflix\.in\/u\/([^/?#]+)/i);
-  if (web?.[1]) return decodeURIComponent(web[1]);
-  return null;
-}
 
 /**
  * Opens a shared profile link (multiflix.in/u/<username>) inside the app:
@@ -29,31 +29,60 @@ function usernameFromUrl(url: string): string | null {
  */
 export function useProfileDeepLinks(navReady: boolean): void {
   const [resolveUsername] = useLazyResolveUsernameQuery();
-  const pendingUsernameRef = useRef<string | null>(null);
+  const [getPostById] = useLazyGetPostByIdQuery();
+  const pendingTargetRef = useRef<DeepLinkTarget | null>(null);
+  const lastHandledUrlRef = useRef<string | null>(null);
 
   const openProfile = useCallback(
-    async (username: string) => {
+    async (target: DeepLinkTarget) => {
+      if (target.kind === 'music') {
+        navigateToMusicNowPlaying(target.value);
+        return;
+      }
+      if (target.kind === 'blog') {
+        navigateToBloggingWatch(target.value);
+        return;
+      }
+      if (target.kind === 'video') {
+        try {
+          const post = await getPostById(target.value).unwrap();
+          if (!post?.id) {
+            navigateToHomeFeed();
+            return;
+          }
+          navigateToPost(post);
+        } catch {
+          // The public post route may be protected or temporarily unavailable.
+          // Prevent the app from staying on a stale empty state; fall back home.
+          if (rootNavigationRef.isReady()) {
+            navigateToHomeFeed();
+          }
+        }
+        return;
+      }
       try {
-        const { userId } = await resolveUsername(username).unwrap();
+        const { userId } = await resolveUsername(target.value).unwrap();
         if (userId) navigateToUserProfile(userId);
       } catch {
         // Best-effort — the app already opened; just don't navigate.
       }
     },
-    [resolveUsername],
+    [getPostById, resolveUsername],
   );
 
   const handleUrl = useCallback(
     (url: string | null) => {
       if (!url) return;
-      const username = usernameFromUrl(url);
-      if (!username) return;
+      const normalized = url.trim();
+      const target = targetFromUrl(normalized);
+      if (!target) return;
+      if (lastHandledUrlRef.current === normalized) return;
+      lastHandledUrlRef.current = normalized;
       if (!rootNavigationRef.isReady()) {
-        // Cold start before the navigator mounted — flush once ready.
-        pendingUsernameRef.current = username;
+        pendingTargetRef.current = target;
         return;
       }
-      void openProfile(username);
+      void openProfile(target);
     },
     [openProfile],
   );
@@ -62,7 +91,7 @@ export function useProfileDeepLinks(navReady: boolean): void {
   useEffect(() => {
     Linking.getInitialURL()
       .then(handleUrl)
-      .catch(() => {});
+      .catch(() => { });
   }, [handleUrl]);
 
   // Warm: a link tapped while the app is running.
@@ -73,10 +102,10 @@ export function useProfileDeepLinks(navReady: boolean): void {
 
   // Flush a queued cold-start username once the navigator is ready.
   useEffect(() => {
-    if (navReady && pendingUsernameRef.current) {
-      const username = pendingUsernameRef.current;
-      pendingUsernameRef.current = null;
-      void openProfile(username);
+    if (navReady && pendingTargetRef.current) {
+      const target = pendingTargetRef.current;
+      pendingTargetRef.current = null;
+      void openProfile(target);
     }
   }, [navReady, openProfile]);
 }

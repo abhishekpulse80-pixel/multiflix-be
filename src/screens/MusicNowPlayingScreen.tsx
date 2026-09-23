@@ -20,6 +20,7 @@ import {
 import Svg, { Path } from 'react-native-svg';
 import { useSelector } from 'react-redux';
 import { MusicNowPlayingSkeleton } from '../components/music/MusicSkeletons';
+import { FeedShareIcon } from '../components/icons/FeedActionIcons';
 import { useMusicPlayer } from '../context/MusicPlayerContext';
 import type { MusicStackParamList } from '../navigation/types';
 import {

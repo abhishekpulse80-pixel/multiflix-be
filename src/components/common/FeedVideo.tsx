@@ -107,6 +107,7 @@ export function FeedVideo({
   useAdaptiveMediaUrl(uri, 'video', token, isVisible);
   const [manualPaused, setManualPaused] = useState(false);
   const [loading, setLoading] = useState(true);
+  const hasLoadedRef = useRef(false);
   const [showIcon, setShowIcon] = useState(false);
   const [layout, setLayout] = useState<{ w: number; h: number } | null>(null);
   const iconTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -123,8 +124,15 @@ export function FeedVideo({
   }, []);
 
   useEffect(() => {
-    if (isVisible) setLoading(true);
+    if (isVisible && !hasLoadedRef.current) {
+      setLoading(true);
+    }
   }, [isVisible]);
+
+  useEffect(() => {
+    hasLoadedRef.current = false;
+    setLoading(true);
+  }, [uri]);
 
   // Notify the parent when the effective paused state changes so it can
   // keep curated music in lockstep with the video.
@@ -141,6 +149,7 @@ export function FeedVideo({
 
   const onLoad = useCallback(
     (_data: OnLoadData) => {
+      hasLoadedRef.current = true;
       setLoading(false);
       onLoadingChange?.(false);
     },
@@ -149,8 +158,15 @@ export function FeedVideo({
 
   const onBuffer = useCallback(
     ({ isBuffering }: { isBuffering: boolean }) => {
-      setLoading(isBuffering);
-      onLoadingChange?.(isBuffering);
+      // Keep the poster spinner limited to the initial load. Short network
+      // rebuffer events are common during scrolling and should not cover the
+      // already-playing reel with a full-screen loader.
+      if (!hasLoadedRef.current) {
+        setLoading(isBuffering);
+        onLoadingChange?.(isBuffering);
+      } else if (!isBuffering) {
+        onLoadingChange?.(false);
+      }
     },
     [onLoadingChange],
   );
@@ -238,7 +254,7 @@ export function FeedVideo({
               resizeMode="cover"
             />
           ) : null}
-          {isVisible && (
+          {isVisible && !posterUri && (
             <View style={styles.loadingOverlay}>
               <ActivityIndicator color="#FFFFFF" size="large" />
             </View>

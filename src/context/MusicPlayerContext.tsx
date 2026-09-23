@@ -190,6 +190,7 @@ export function MusicPlayerProvider({
   const durationRef = useRef(0);
   const onTrackEndRef = useRef<(() => void) | null>(null);
   const queueRef = useRef<MusicPlayerTrack[]>([]);
+  const playingRef = useRef(false);
   useEffect(() => {
     queueRef.current = queue;
   }, [queue]);
@@ -242,7 +243,14 @@ export function MusicPlayerProvider({
           await TrackPlayer.skip(targetIdx);
           if (cancelled) return;
         }
-        await TrackPlayer.play();
+        const { state } = await TrackPlayer.getPlaybackState();
+        if (
+          state !== State.Playing &&
+          state !== State.Buffering &&
+          state !== State.Loading
+        ) {
+          await TrackPlayer.play();
+        }
         return;
       }
 
@@ -252,7 +260,14 @@ export function MusicPlayerProvider({
       if (activeIdx !== targetIdx) {
         await TrackPlayer.skip(targetIdx);
         if (cancelled) return;
-        await TrackPlayer.play();
+        const { state } = await TrackPlayer.getPlaybackState();
+        if (
+          state !== State.Playing &&
+          state !== State.Buffering &&
+          state !== State.Loading
+        ) {
+          await TrackPlayer.play();
+        }
       }
     })();
 
@@ -294,7 +309,8 @@ export function MusicPlayerProvider({
             event.state === State.Playing ||
             event.state === State.Buffering ||
             event.state === State.Loading;
-          setPlaying(prev => (prev !== isActive ? isActive : prev));
+          playingRef.current = isActive;
+          setPlaying(prev => (prev === isActive ? prev : isActive));
           break;
         }
         case Event.PlaybackProgressUpdated: {
@@ -357,12 +373,13 @@ export function MusicPlayerProvider({
 
   const togglePlay = useCallback(() => {
     void (async () => {
-      const { state } = await TrackPlayer.getPlaybackState();
-      if (
-        state === State.Playing ||
-        state === State.Buffering ||
-        state === State.Loading
-      ) {
+      const isCurrentlyPlaying =
+        playingRef.current ||
+        (await TrackPlayer.getPlaybackState()).state === State.Playing ||
+        (await TrackPlayer.getPlaybackState()).state === State.Buffering ||
+        (await TrackPlayer.getPlaybackState()).state === State.Loading;
+
+      if (isCurrentlyPlaying) {
         await TrackPlayer.pause();
       } else {
         await TrackPlayer.play();

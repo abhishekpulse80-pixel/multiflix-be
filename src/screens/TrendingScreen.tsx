@@ -546,6 +546,7 @@ export function TrendingScreen() {
       musicTitle: p.musicTitle ?? '',
       music: p.music ?? null,
       originalSound: p.originalSound ?? null,
+      posterUri: p.thumbnailUrl,
       videoDurationSec: p.durationSeconds ?? null,
       comments: p.commentsCount,
       likedByViewer: p.likedByViewer,

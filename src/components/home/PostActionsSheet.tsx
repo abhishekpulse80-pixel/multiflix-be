@@ -14,7 +14,6 @@ const MUTED = '#6B6B6B';
 type Props = {
   visible: boolean;
   onClose: () => void;
-  /** Share the post author's profile via the native share sheet. */
   onShareProfile: () => void;
   /** Report the post. */
   onReport: () => void;

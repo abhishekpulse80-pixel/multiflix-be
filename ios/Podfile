@@ -20,12 +20,14 @@ end
 target 'Multiflix' do
   config = use_native_modules!
 
-  # @react-native-firebase/app — only these Firebase/Google pods need module maps
-  # when built as static libraries. Applying `use_modular_headers!` globally breaks
-  # RN 0.83's internal modulemaps (react_runtime / _DarwinFoundation redefinitions).
+  # @react-native-firebase/app / AppCheckCore require modular headers for Swift
+  # static-library builds. Keep this scoped to the known pods instead of enabling
+  # `use_modular_headers!` globally, which breaks RN 0.83 internals.
   pod 'FirebaseCore', :modular_headers => true
   pod 'FirebaseCoreInternal', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
+  pod 'AppCheckCore', :modular_headers => true
+  pod 'RecaptchaInterop', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],

@@ -184,7 +184,6 @@ export const FeedPost = React.memo(function FeedPost({
   const [saved, setSaved] = useState(() => post.savedByViewer ?? false);
   const [setPostSave] = useSetPostSaveMutation();
   const [shareOpen, setShareOpen] = useState(false);
-  // "Share profile" now sends the profile into a chat (not the OS share sheet).
   const [shareProfileOpen, setShareProfileOpen] = useState(false);
   // 3-dots actions menu (Share profile + Report + Block).
   const [actionsOpen, setActionsOpen] = useState(false);
